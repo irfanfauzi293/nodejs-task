@@ -6,8 +6,18 @@ const typeDefs = gql`
 
     scalar Date
 
+    input inputCustomer {
+        name : String
+        pob : String
+        dob : Date
+        nik : String
+        mmn : String
+        mob : String
+        npwp : String
+    }
+
     type Customer {
-        dataId : Int
+        dataId : ID
         name : String
         pob : String
         dob : Date
@@ -21,13 +31,23 @@ const typeDefs = gql`
 
     type Query {
         customers : [Customer]
+        customer(dataId:Int) : Customer 
     }
+
+    type Mutation {
+        createCustomer(customer:inputCustomer) : Customer
+    }
+
 `
 
 const resolvers = {
     Date : ()=> date,
     Query : {
-        customers: async () => await dao.selectAll()
+        customers: async () => await dao.selectAll(),
+        customer : (_,{dataId}) => dao.selectId(dataId)
+    },
+    Mutation : {
+        createCustomer : (_,{customer}) => dao.insert(customer)
     }
 }
 
